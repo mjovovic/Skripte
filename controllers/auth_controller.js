@@ -1,10 +1,8 @@
 const config = require("../config/auth_config");
 const db = require("../models");
 const User = db.user;
-const Roler = db.role;
-const crypto = require('crypto');
+const Role = db.role;
 var jwt = require("jsonwebtoken");
-const Role = require("../models/roles");
 const bcrypt = require("bcryptjs/dist/bcrypt");
 const validator = require("email-validator");
 
@@ -19,10 +17,10 @@ exports.signup = (req, res) => {
         res.status(400).send({message: `Invalid Email format ${req.body.email}`});
         return;
     }
-    if(res.body.password.lenght < 5){
+   /* if(res.body.password.lenght < 5){
         res.status(400).send({message: `Password to weak`});
         return;
-    }
+    }*/
     const user = new User({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
@@ -100,29 +98,36 @@ exports.signin = (req, res) => {
         );
 
         if( !passwordIsValid ) {
-            return res.status(401).send({
-                accessToken: null,
-                message: "Invalid Password!"
-            });
+            return res.status(401).send({message: "Invalid Password!"});
         }
 
         var token = jwt.sign({id: user.id}, config.secret, {
             expiresIn: 86400 //24h
         });
 
-        var authorities = [];
-
-        for (let i = 0; i < user.roles.lenght; i++) {
-            authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
-        }
+        // var authorities = [];
+        // console.log(`im here`);
+        // for (let i = 0; i < user.roles.lenght; i++) {
+        //     authorities.push( user.roles[i].name);
+        //     console.log(`${user.role[i].name}`);
+        // }
+        // console.log(`im here`);
+        req.session.token = token;
 
         res.status(200).send({
             id: user._id,
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
-            roles: authorities,
-            accessToken: token
+            roles: user.roles
         });
     });
+}
+exports.signout = async(req, res) => {
+    try {
+        req.session = null;
+        return res.status(200).send({message: "Youre signed out"});
+    } catch (err) {
+        this.next(err);
+    }
 }

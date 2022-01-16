@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { append } = require("joi/lib/types/object");
 const db_config = require("./config/db_config");
+const cookie_session = require("cookie-session");
 const app = express();
 
 var corsOptions = {
@@ -13,6 +14,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true}));
+
+app.use(cookie_session({
+    name: "bookstore-session",
+    secret: "COOKIE_SECRET",
+    httpOnly: true
+    })
+);
 
 const db = require("./models");
 const Role = db.role;

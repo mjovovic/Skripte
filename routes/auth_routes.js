@@ -7,7 +7,7 @@ module.exports = function(app) {
     app.use(function(req, res, next){
         res.header(
             "Access-Control-Allow-Headers",
-            "x-access-token, Origin, Content-Type, Accept"
+            "Origin, Content-Type, Accept"
         );
         next();
     });
@@ -24,6 +24,8 @@ module.exports = function(app) {
         );
     
     app.post("/api/auth/signin", controller.signin);
+
+    app.post("/api/auth/signout", controller.signout);
     
     app.get("/api/auth/signin", (req, res) => {
         res.sendFile(path.join(__dirname, '../static/login.html'));

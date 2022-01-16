@@ -5,8 +5,8 @@ const User = db.user;
 const Role = db.role;
 
 verifyToken = (req, res, next) => {
-    let token = req.headers["x-access-token"];
-
+    //let token = req.headers["x-access-token"];
+    let token = req.session.token;
     if (!token) {
         return res.status(403).send({ message : "No teken provided!" });
     }
@@ -36,7 +36,7 @@ isAdmin = (req, res, next) => {
                     res.status(500).send({ message: err});
                     return;
                 }
-                for( let i = 0; i <roles.lenght; i++) {
+                for( let i = 0; i < 3 && roles[i]!=null; i++) {
                     if( roles[i].name === "admin" ){
                         next();
                         return;
@@ -66,8 +66,8 @@ isModerator = (req, res, next) => {
                     return;
                 }
 
-                for( let i = 0; i < roles.lenght; i++){
-                    if(roles[i].name === "moderator"){
+                for( let i = 0; i < 3 && roles[i]!=null; i++){
+                    if(roles[i].name === "moderator" || roles[i].name === "admin"){
                         next();
                         return;
                     }
